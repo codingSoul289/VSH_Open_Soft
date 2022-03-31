@@ -1,1 +1,114 @@
-# VSH_Open_Soft
+eksctl - The official CLI for Amazon EKS
+Coverage Status Go Report Card
+
+eksctl is a simple CLI tool for creating clusters on EKS - Amazon's new managed Kubernetes service for EC2. It is written in Go, and uses CloudFormation.
+
+You can create a cluster in minutes with just one command – eksctl create cluster!
+
+Gophers: E, K, S, C, T, & L
+
+Need help? Join Weave Community Slack.
+
+Installation
+To download the latest release, run:
+
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+For ARM system, please change ARCH (e.g. armv6, armv7 or arm64) accordingly
+
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_arm64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+Alternatively, macOS users can use Homebrew:
+
+brew tap weaveworks/tap
+brew install weaveworks/tap/eksctl
+and Windows users can use chocolatey:
+
+chocolatey install eksctl
+or scoop:
+
+scoop install eksctl
+AWS Account
+You will need to have AWS API credentials configured. What works for AWS CLI or any other tools (kops, Terraform etc), should be sufficient. You can use ~/.aws/credentials file or environment variables. For more information read AWS documentation.
+
+You will also need AWS IAM Authenticator for Kubernetes command (either aws-iam-authenticator or aws eks get-token (available in version 1.16.156 or greater of AWS CLI) in your PATH.
+
+The IAM account used for EKS cluster creation should have these minimal access levels.
+
+AWS Service	Access Level
+CloudFormation	Full Access
+EC2	Full: Tagging Limited: List, Read, Write
+EC2 Auto Scaling	Limited: List, Write
+EKS	Full Access
+IAM	Limited: List, Read, Write, Permissions Management
+Systems Manager	Limited: List, Read
+The inline policy json is listed in Minimal IAM Policies.
+
+Docker
+For every release and RC a docker image is pushed to weaveworks/eksctl.
+
+Basic usage
+To create a basic cluster, run:
+
+eksctl create cluster
+A cluster will be created with default parameters
+
+exciting auto-generated name, e.g. "fabulous-mushroom-1527688624"
+2x m5.large nodes (this instance type suits most common use-cases, and is good value for money)
+use official AWS EKS AMI
+us-west-2 region
+dedicated VPC (check your quotas)
+Once you have created a cluster, you will find that cluster credentials were added in ~/.kube/config. If you have kubectl v1.10.x as well as aws-iam-authenticator commands in your PATH, you should be able to use kubectl. You will need to make sure to use the same AWS API credentials for this also. Check EKS docs for instructions. If you installed eksctl via Homebrew, you should have all of these dependencies installed already.
+
+Example output:
+
+$ eksctl create cluster
+[ℹ]  eksctl version 0.6.0
+[ℹ]  using region us-west-2
+[ℹ]  setting availability zones to [us-west-2a us-west-2c us-west-2b]
+[ℹ]  subnets for us-west-2a - public:192.168.0.0/19 private:192.168.96.0/19
+[ℹ]  subnets for us-west-2c - public:192.168.32.0/19 private:192.168.128.0/19
+[ℹ]  subnets for us-west-2b - public:192.168.64.0/19 private:192.168.160.0/19
+[ℹ]  nodegroup "ng-98b3b83a" will use "ami-05ecac759c81e0b0c" [AmazonLinux2/1.11]
+[ℹ]  creating EKS cluster "floral-unicorn-1540567338" in "us-west-2" region
+[ℹ]  will create 2 separate CloudFormation stacks for cluster itself and the initial nodegroup
+[ℹ]  if you encounter any issues, check CloudFormation console or try 'eksctl utils describe-stacks --region=us-west-2 --cluster=floral-unicorn-1540567338'
+[ℹ]  2 sequential tasks: { create cluster control plane "floral-unicorn-1540567338", create managed nodegroup "ng-98b3b83a" }
+[ℹ]  building cluster stack "eksctl-floral-unicorn-1540567338-cluster"
+[ℹ]  deploying stack "eksctl-floral-unicorn-1540567338-cluster"
+[ℹ]  building nodegroup stack "eksctl-floral-unicorn-1540567338-nodegroup-ng-98b3b83a"
+[ℹ]  --nodes-min=2 was set automatically for nodegroup ng-98b3b83a
+[ℹ]  --nodes-max=2 was set automatically for nodegroup ng-98b3b83a
+[ℹ]  deploying stack "eksctl-floral-unicorn-1540567338-nodegroup-ng-98b3b83a"
+[✔]  all EKS cluster resources for "floral-unicorn-1540567338" have been created
+[✔]  saved kubeconfig as "~/.kube/config"
+[ℹ]  adding role "arn:aws:iam::376248598259:role/eksctl-ridiculous-sculpture-15547-NodeInstanceRole-1F3IHNVD03Z74" to auth ConfigMap
+[ℹ]  nodegroup "ng-98b3b83a" has 1 node(s)
+[ℹ]  node "ip-192-168-64-220.us-west-2.compute.internal" is not ready
+[ℹ]  waiting for at least 2 node(s) to become ready in "ng-98b3b83a"
+[ℹ]  nodegroup "ng-98b3b83a" has 2 node(s)
+[ℹ]  node "ip-192-168-64-220.us-west-2.compute.internal" is ready
+[ℹ]  node "ip-192-168-8-135.us-west-2.compute.internal" is ready
+[ℹ]  kubectl command should work with "~/.kube/config", try 'kubectl get nodes'
+[✔]  EKS cluster "floral-unicorn-1540567338" in "us-west-2" region is ready
+$
+Install eksctl following the installation instructions.
+
+To learn more about what eksctl can do check eksctl.io. A good place to start is Getting Started. The full list of features can be found here.
+
+Contributions
+Code contributions are very welcome. If you are interested in helping make eksctl great then see our contributing guide. Or join the discussion on our mailing list.
+
+We follow the CNCF Code of Conduct.
+
+Releases
+Minor releases of eksctl should be expected every two weeks and patch releases will be made available as needed.
+
+One or more release candidate(s) (RC) builds will be made available prior to each minor release. RC builds are intended only for testing purposes.
+
+Get in touch
+Create an issue, or login to Weave Community Slack (#eksctl) (signup).
+
+Logo Credits
+
+Original Gophers drawn by Ashley McNamara, unique E, K, S, C, T & L Gopher identities had been produced with Gopherize.me.
